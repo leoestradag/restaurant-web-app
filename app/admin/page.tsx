@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowLeft, Plus, Scan, Pencil, Trash2, Upload, Loader2, Check } from "lucide-react"
+import { ArrowLeft, Plus, Scan, Pencil, Trash2, Upload, Loader2, Check, QrCode } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -34,8 +34,9 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useRestaurant } from "@/lib/restaurant-context"
 import { type Product } from "@/lib/data"
+import { QRGenerator } from "@/components/qr-generator"
 
-type EditMode = "list" | "edit" | "add" | "scan"
+type EditMode = "list" | "edit" | "add" | "scan" | "qr"
 
 export default function AdminPage() {
   const { products, categories, addProduct, updateProduct, deleteProduct, setProducts } = useRestaurant()
@@ -181,18 +182,26 @@ export default function AdminPage() {
 
       <main className="px-4 py-4 pb-24">
         {/* Action Buttons */}
-        <div className="flex gap-3 mb-6">
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          <Button
+            onClick={() => setMode("qr")}
+            variant="outline"
+            className="h-auto py-4 flex-col gap-2"
+          >
+            <QrCode className="w-6 h-6" />
+            <span className="text-sm">Códigos QR</span>
+          </Button>
           <Button
             onClick={() => setMode("scan")}
             variant="outline"
-            className="flex-1 h-auto py-4 flex-col gap-2"
+            className="h-auto py-4 flex-col gap-2"
           >
             <Scan className="w-6 h-6" />
             <span className="text-sm">Escanear Menú</span>
           </Button>
           <Button
             onClick={handleAdd}
-            className="flex-1 h-auto py-4 flex-col gap-2"
+            className="h-auto py-4 flex-col gap-2"
           >
             <Plus className="w-6 h-6" />
             <span className="text-sm">Agregar Platillo</span>
@@ -216,7 +225,15 @@ export default function AdminPage() {
           ))}
         </div>
 
+        {/* QR Generator View */}
+        {mode === "qr" && (
+          <div className="mb-6">
+            <QRGenerator />
+          </div>
+        )}
+
         {/* Products List */}
+        {mode === "list" && (
         <div className="space-y-3">
           {filteredProducts.map((product) => (
             <Card key={product.id} className="p-3">
@@ -265,6 +282,7 @@ export default function AdminPage() {
             </div>
           )}
         </div>
+        )}
       </main>
 
       {/* Edit/Add Dialog */}

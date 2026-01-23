@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { CartProvider } from "@/lib/cart-context"
 import { RestaurantProvider } from "@/lib/restaurant-context"
+import { TableProvider } from "@/lib/table-context"
 import "./globals.css"
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -40,11 +41,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased">
-        <RestaurantProvider>
-          <CartProvider>
-            {children}
-          </CartProvider>
-        </RestaurantProvider>
+        <TableProvider>
+          <RestaurantProvider>
+            <CartProvider>
+              {children}
+            </CartProvider>
+          </RestaurantProvider>
+        </TableProvider>
         <Analytics />
       </body>
     </html>

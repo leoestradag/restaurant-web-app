@@ -6,10 +6,15 @@ import { ShoppingBag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/lib/cart-context"
+import { useTable } from "@/lib/table-context"
 import { restaurant } from "@/lib/data"
 
 export function RestaurantHeader() {
   const { itemCount } = useCart()
+  const { tableNumber } = useTable()
+  
+  // Usar la mesa de la URL si está disponible, sino usar la del data
+  const currentTable = tableNumber || restaurant.tableNumber
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b">
@@ -26,7 +31,7 @@ export function RestaurantHeader() {
           <div>
             <h1 className="font-semibold text-foreground">{restaurant.name}</h1>
             <p className="text-xs text-muted-foreground">
-              Table {restaurant.tableNumber}
+              Mesa {currentTable}
             </p>
           </div>
         </div>
