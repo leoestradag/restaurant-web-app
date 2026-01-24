@@ -185,7 +185,7 @@ export default function AdminPage() {
         <div className="grid grid-cols-3 gap-3 mb-6">
           <Button
             onClick={() => setMode("qr")}
-            variant="outline"
+            variant={mode === "qr" ? "default" : "outline"}
             className="h-auto py-4 flex-col gap-2"
           >
             <QrCode className="w-6 h-6" />
@@ -208,27 +208,39 @@ export default function AdminPage() {
           </Button>
         </div>
 
-        {/* Category Tabs */}
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 mb-4">
-          {categories.map((category) => (
-            <button
-              key={category.id}
-              onClick={() => setActiveCategory(category.id)}
-              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                activeCategory === category.id
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary text-secondary-foreground"
-              }`}
-            >
-              {category.name}
-            </button>
-          ))}
-        </div>
-
         {/* QR Generator View */}
         {mode === "qr" && (
-          <div className="mb-6">
+          <div className="mb-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Generador de Códigos QR</h2>
+              <Button
+                variant="outline"
+                onClick={() => setMode("list")}
+                size="sm"
+              >
+                Volver a Lista
+              </Button>
+            </div>
             <QRGenerator />
+          </div>
+        )}
+
+        {/* Category Tabs - Solo mostrar cuando no está en modo QR */}
+        {mode !== "qr" && (
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 mb-4">
+            {categories.map((category) => (
+              <button
+                key={category.id}
+                onClick={() => setActiveCategory(category.id)}
+                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                  activeCategory === category.id
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-secondary-foreground"
+                }`}
+              >
+                {category.name}
+              </button>
+            ))}
           </div>
         )}
 

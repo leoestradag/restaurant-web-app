@@ -1,20 +1,46 @@
 "use client"
 
-import { QRCodeSVG } from "react-qr-code"
 import { Download, Copy, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useTable } from "@/lib/table-context"
+import dynamic from "next/dynamic"
+
+// Cargar QRCodeSVG dinámicamente solo en el cliente
+const QRCodeSVG = dynamic(
+  () => import("react-qr-code").then((mod) => mod.QRCodeSVG),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="w-[200px] h-[200px] flex items-center justify-center bg-gray-100 rounded">
+        <p className="text-sm text-gray-500">Cargando QR...</p>
+      </div>
+    )
+  }
+)
 
 export function QRGenerator() {
   const { getTableUrl } = useTable()
   const [tableNumber, setTableNumber] = useState<number>(1)
   const [copied, setCopied] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  // Asegurar que solo se renderice en el cliente
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const tableUrl = getTableUrl(tableNumber)
+
+  // Verificar que la URL se genere correctamente
+  useEffect(() => {
+    if (tableUrl) {
+      console.log("Table URL generated:", tableUrl)
+    }
+  }, [tableUrl])
 
   const handleDownload = () => {
     const svg = document.getElementById(`qr-code-${tableNumber}`)
@@ -64,14 +90,20 @@ export function QRGenerator() {
       </div>
 
       <Card className="p-6 flex flex-col items-center space-y-4">
-        <div className="bg-white p-4 rounded-lg">
-          <QRCodeSVG
-            id={`qr-code-${tableNumber}`}
-            value={tableUrl}
-            size={200}
-            level="H"
-            includeMargin={true}
-          />
+        <div className="bg-white p-4 rounded-lg flex items-center justify-center">
+          {mounted && tableUrl ? (
+            <QRCodeSVG
+              id={`qr-code-${tableNumber}`}
+              value={tableUrl}
+              size={200}
+              level="H"
+              includeMargin={true}
+            />
+          ) : (
+            <div className="w-[200px] h-[200px] flex items-center justify-center bg-gray-100 rounded">
+              <p className="text-sm text-gray-500">Cargando QR...</p>
+            </div>
+          )}
         </div>
         
         <div className="text-center space-y-2 w-full">
