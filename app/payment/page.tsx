@@ -3,14 +3,16 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, CreditCard, Check } from "lucide-react"
+import { ArrowLeft, CreditCard, Check, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
 import { useCart } from "@/lib/cart-context"
+import { SplitPayment } from "@/components/split-payment"
 
 const paymentMethods = [
   { id: "card", name: "Credit Card", icon: CreditCard },
@@ -42,14 +44,22 @@ function GooglePayIcon() {
   )
 }
 
+interface SplitPerson {
+  id: string
+  name: string
+  items: { itemId: string; quantity: number }[]
+}
+
 export default function PaymentPage() {
   const router = useRouter()
-  const { subtotal, tax, total, clearCart } = useCart()
+  const { items, subtotal, tax, total, clearCart } = useCart()
   const [selectedPayment, setSelectedPayment] = useState("card")
   const [selectedTip, setSelectedTip] = useState("10")
   const [customTip, setCustomTip] = useState("")
   const [isProcessing, setIsProcessing] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
+  const [splitPayment, setSplitPayment] = useState(false)
+  const [splitPeople, setSplitPeople] = useState<SplitPerson[]>([])
 
   const tipValue = selectedTip === "custom" 
     ? Number.parseFloat(customTip) || 0 
@@ -60,6 +70,20 @@ export default function PaymentPage() {
     : subtotal * tipValue
 
   const grandTotal = total + tipAmount
+
+  // Calcular totales por persona si está dividido
+  const calculatePersonTotal = (person: SplitPerson): number => {
+    const personItems = items.filter((item) =>
+      person.items.some((pi) => pi.itemId === item.id)
+    )
+    const personSubtotal = personItems.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    )
+    const personTax = personSubtotal * (tax / subtotal) || 0
+    const personTip = personSubtotal * tipValue
+    return personSubtotal + personTax + personTip
+  }
 
   const handlePayment = async () => {
     setIsProcessing(true)
@@ -102,6 +126,42 @@ export default function PaymentPage() {
       </header>
 
       <main className="px-4 py-4 pb-32 space-y-6">
+        {/* Split Payment Toggle */}
+        <section>
+          <Card className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Users className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <Label htmlFor="split-payment" className="text-base font-medium cursor-pointer">
+                    Dividir cuenta
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Divide la cuenta entre varias personas
+                  </p>
+                </div>
+              </div>
+              <Switch
+                id="split-payment"
+                checked={splitPayment}
+                onCheckedChange={setSplitPayment}
+              />
+            </div>
+          </Card>
+        </section>
+
+        {/* Split Payment Section */}
+        {splitPayment && (
+          <section>
+            <SplitPayment
+              items={items}
+              subtotal={subtotal}
+              tax={tax}
+              onSplitChange={setSplitPeople}
+            />
+          </section>
+        )}
+
         {/* Payment Methods */}
         <section>
           <h2 className="font-medium text-foreground mb-3">Payment Method</h2>
@@ -189,37 +249,87 @@ export default function PaymentPage() {
 
         {/* Order Summary */}
         <section>
-          <h2 className="font-medium text-foreground mb-3">Order Summary</h2>
-          <Card className="p-4 space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span className="text-foreground">${subtotal.toFixed(2)}</span>
+          <h2 className="font-medium text-foreground mb-3">
+            {splitPayment ? "Resumen por Persona" : "Order Summary"}
+          </h2>
+          {splitPayment && splitPeople.length > 0 ? (
+            <div className="space-y-3">
+              {splitPeople.map((person) => {
+                const personTotal = calculatePersonTotal(person)
+                return (
+                  <Card key={person.id} className="p-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-medium text-foreground">{person.name}</span>
+                      <span className="font-semibold text-lg">
+                        ${personTotal.toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {person.items.length} {person.items.length === 1 ? "item" : "items"}
+                    </div>
+                  </Card>
+                )
+              })}
+              <Card className="p-4 bg-muted/50">
+                <div className="flex justify-between font-semibold text-lg">
+                  <span className="text-foreground">Total General</span>
+                  <span className="text-foreground">${grandTotal.toFixed(2)}</span>
+                </div>
+              </Card>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Tax</span>
-              <span className="text-foreground">${tax.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Tip</span>
-              <span className="text-foreground">${tipAmount.toFixed(2)}</span>
-            </div>
-            <Separator />
-            <div className="flex justify-between font-semibold text-lg">
-              <span className="text-foreground">Total</span>
-              <span className="text-foreground">${grandTotal.toFixed(2)}</span>
-            </div>
-          </Card>
+          ) : (
+            <Card className="p-4 space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Subtotal</span>
+                <span className="text-foreground">${subtotal.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Tax</span>
+                <span className="text-foreground">${tax.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Tip</span>
+                <span className="text-foreground">${tipAmount.toFixed(2)}</span>
+              </div>
+              <Separator />
+              <div className="flex justify-between font-semibold text-lg">
+                <span className="text-foreground">Total</span>
+                <span className="text-foreground">${grandTotal.toFixed(2)}</span>
+              </div>
+            </Card>
+          )}
         </section>
       </main>
 
       <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4">
-        <Button 
-          className="w-full h-12 text-base" 
-          onClick={handlePayment}
-          disabled={isProcessing || subtotal === 0}
-        >
-          {isProcessing ? "Processing..." : `Pay $${grandTotal.toFixed(2)}`}
-        </Button>
+        {splitPayment && splitPeople.length > 0 ? (
+          <div className="space-y-2">
+            {splitPeople.map((person) => {
+              const personTotal = calculatePersonTotal(person)
+              return (
+                <Button
+                  key={person.id}
+                  className="w-full h-12 text-base"
+                  onClick={handlePayment}
+                  disabled={isProcessing || personTotal === 0}
+                  variant="outline"
+                >
+                  {isProcessing
+                    ? "Processing..."
+                    : `${person.name}: Pay $${personTotal.toFixed(2)}`}
+                </Button>
+              )
+            })}
+          </div>
+        ) : (
+          <Button
+            className="w-full h-12 text-base"
+            onClick={handlePayment}
+            disabled={isProcessing || subtotal === 0}
+          >
+            {isProcessing ? "Processing..." : `Pay $${grandTotal.toFixed(2)}`}
+          </Button>
+        )}
       </div>
     </div>
   )
