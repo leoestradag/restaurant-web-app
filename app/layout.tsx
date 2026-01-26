@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { CartProvider } from "@/lib/cart-context"
 import { RestaurantProvider } from "@/lib/restaurant-context"
 import { TableProvider } from "@/lib/table-context"
+import { PaymentMethodsProvider } from "@/lib/payment-methods-context"
 import "./globals.css"
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -43,9 +44,11 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <TableProvider>
           <RestaurantProvider>
-            <CartProvider>
-              {children}
-            </CartProvider>
+            <PaymentMethodsProvider>
+              <CartProvider>
+                {children}
+              </CartProvider>
+            </PaymentMethodsProvider>
           </RestaurantProvider>
         </TableProvider>
         <Analytics />

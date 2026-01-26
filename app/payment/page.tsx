@@ -3,16 +3,26 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, CreditCard, Check, Users } from "lucide-react"
+import { ArrowLeft, CreditCard, Check, Users, Zap, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
 import { useCart } from "@/lib/cart-context"
 import { SplitPayment } from "@/components/split-payment"
+import { usePaymentMethods } from "@/lib/payment-methods-context"
+import { SavedPaymentMethods } from "@/components/saved-payment-methods"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 const paymentMethods = [
   { id: "card", name: "Credit Card", icon: CreditCard },
@@ -53,6 +63,7 @@ interface SplitPerson {
 export default function PaymentPage() {
   const router = useRouter()
   const { items, subtotal, tax, total, clearCart } = useCart()
+  const { savedMethods, getDefaultMethod } = usePaymentMethods()
   const [selectedPayment, setSelectedPayment] = useState("card")
   const [selectedTip, setSelectedTip] = useState("10")
   const [customTip, setCustomTip] = useState("")
@@ -60,6 +71,9 @@ export default function PaymentPage() {
   const [isComplete, setIsComplete] = useState(false)
   const [splitPayment, setSplitPayment] = useState(false)
   const [splitPeople, setSplitPeople] = useState<SplitPerson[]>([])
+  const [useSavedMethod, setUseSavedMethod] = useState(false)
+  const [selectedSavedMethod, setSelectedSavedMethod] = useState<string | null>(null)
+  const [showSavedMethods, setShowSavedMethods] = useState(false)
 
   const tipValue = selectedTip === "custom" 
     ? Number.parseFloat(customTip) || 0 
@@ -88,11 +102,24 @@ export default function PaymentPage() {
   const handlePayment = async () => {
     setIsProcessing(true)
     // Simulate payment processing
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    await new Promise((resolve) => setTimeout(resolve, 2000))
     setIsProcessing(false)
     setIsComplete(true)
     clearCart()
   }
+
+  const handleQuickPay = async () => {
+    const defaultMethod = getDefaultMethod()
+    if (!defaultMethod) return
+
+    setSelectedSavedMethod(defaultMethod.id)
+    setUseSavedMethod(true)
+    setSelectedPayment(defaultMethod.type)
+    await handlePayment()
+  }
+
+  const defaultMethod = getDefaultMethod()
+  const hasQuickPay = defaultMethod !== null && !splitPayment
 
   if (isComplete) {
     return (
@@ -126,6 +153,46 @@ export default function PaymentPage() {
       </header>
 
       <main className="px-4 py-4 pb-32 space-y-6">
+        {/* Quick Pay Button */}
+        {hasQuickPay && (
+          <section>
+            <Card className="p-4 bg-primary/5 border-primary/20">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Zap className="h-5 w-5 text-primary" />
+                  <h3 className="font-semibold text-foreground">Pago Rápido</h3>
+                </div>
+                <Dialog open={showSavedMethods} onOpenChange={setShowSavedMethods}>
+                  <DialogTrigger asChild>
+                    <Button variant="ghost" size="sm" className="gap-2">
+                      <Settings className="h-4 w-4" />
+                      Gestionar
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Métodos de Pago Guardados</DialogTitle>
+                    </DialogHeader>
+                    <SavedPaymentMethods />
+                  </DialogContent>
+                </Dialog>
+              </div>
+              <p className="text-sm text-muted-foreground mb-3">
+                Paga con tu método predeterminado: {defaultMethod?.name}
+              </p>
+              <Button
+                className="w-full"
+                onClick={handleQuickPay}
+                disabled={isProcessing || subtotal === 0}
+                size="lg"
+              >
+                <Zap className="h-4 w-4 mr-2" />
+                {isProcessing ? "Procesando..." : `Pagar $${grandTotal.toFixed(2)}`}
+              </Button>
+            </Card>
+          </section>
+        )}
+
         {/* Split Payment Toggle */}
         <section>
           <Card className="p-4">
@@ -164,7 +231,76 @@ export default function PaymentPage() {
 
         {/* Payment Methods */}
         <section>
-          <h2 className="font-medium text-foreground mb-3">Payment Method</h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-medium text-foreground">Payment Method</h2>
+            {savedMethods.length > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setUseSavedMethod(!useSavedMethod)}
+                className="text-xs"
+              >
+                {useSavedMethod ? "Usar método nuevo" : "Usar método guardado"}
+              </Button>
+            )}
+          </div>
+          
+          {useSavedMethod && savedMethods.length > 0 ? (
+            <div className="space-y-2">
+              {savedMethods.map((method) => {
+                const Icon = paymentMethods.find((m) => m.id === method.type)?.icon || CreditCard
+                return (
+                  <Card
+                    key={method.id}
+                    className={cn(
+                      "p-4 cursor-pointer transition-colors",
+                      selectedSavedMethod === method.id
+                        ? "border-primary bg-primary/5"
+                        : "hover:bg-muted/50"
+                    )}
+                    onClick={() => {
+                      setSelectedSavedMethod(method.id)
+                      setSelectedPayment(method.type)
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        "h-10 w-10 rounded-full flex items-center justify-center",
+                        selectedSavedMethod === method.id
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-muted-foreground"
+                      )}>
+                        <Icon />
+                      </div>
+                      <div className="flex-1">
+                        <span className={cn(
+                          "font-medium",
+                          selectedSavedMethod === method.id
+                            ? "text-primary"
+                            : "text-foreground"
+                        )}>
+                          {method.name}
+                        </span>
+                        {method.last4 && (
+                          <p className="text-xs text-muted-foreground">
+                            •••• {method.last4}
+                          </p>
+                        )}
+                      </div>
+                      {selectedSavedMethod === method.id && (
+                        <Check className="h-5 w-5 text-primary ml-auto" />
+                      )}
+                      {method.isDefault && (
+                        <Badge variant="secondary" className="text-xs">
+                          Predeterminado
+                        </Badge>
+                      )}
+                    </div>
+                  </Card>
+                )
+              })}
+            </div>
+          ) : (
           <div className="space-y-2">
             {paymentMethods.map((method) => {
               const Icon = method.icon
