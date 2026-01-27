@@ -84,30 +84,30 @@ const fonts: Record<
     className: string
   }
 > = {
-  rounded: {
-    name: "Redondeada Moderna",
-    description: "Tipografía amigable y actual.",
-    className: "font-sans",
+  elegant: {
+    name: "Elegante",
+    description: "Estilo refinado y sofisticado para restaurantes de alta cocina.",
+    className: "font-serif italic tracking-normal",
   },
-  serif: {
-    name: "Clásica Serif",
-    description: "Ideal para restaurantes elegantes.",
-    className: "font-serif",
+  "very-elegant": {
+    name: "Muy Elegante",
+    description: "Tipografía de lujo, ideal para restaurantes exclusivos y fine dining.",
+    className: "font-serif font-light tracking-wider",
   },
-  clean: {
-    name: "Minimal Clean",
-    description: "Líneas rectas y limpias.",
-    className: "font-sans tracking-wide",
+  simple: {
+    name: "Simple",
+    description: "Diseño limpio y minimalista, fácil de leer y moderno.",
+    className: "font-sans tracking-normal",
   },
-  playful: {
-    name: "Playful",
-    description: "Títulos más grandes y expresivos.",
-    className: "font-sans tracking-wide uppercase",
+  healthy: {
+    name: "Healthy",
+    description: "Estilo orgánico y amigable, perfecto para restaurantes saludables y naturales.",
+    className: "font-sans font-medium tracking-wide",
   },
-  compact: {
-    name: "Compacta",
-    description: "Texto más compacto para menús con muchos platos.",
-    className: "font-sans text-sm",
+  creative: {
+    name: "Creativa",
+    description: "Tipografía expresiva y única, ideal para restaurantes con personalidad.",
+    className: "font-sans font-bold tracking-tight uppercase",
   },
 }
 
