@@ -77,8 +77,16 @@ export default function AdminPage() {
     }
   }, [currentTheme])
 
-  // Determinar si el texto debe ser blanco (solo para temas "gold" y "ocean")
-  const textColorClass = currentTheme === "gold" || currentTheme === "ocean" ? "text-white" : "text-foreground"
+  // Determinar el color del texto según el tema
+  // - "gold" (Oro & Negro) y "dark" (Noches de Autor): texto blanco
+  // - "ocean" (Ocean Green): texto negro
+  // - Otros temas: texto normal del tema
+  const textColorClass = 
+    currentTheme === "gold" || currentTheme === "dark" 
+      ? "text-white" 
+      : currentTheme === "ocean" 
+      ? "text-black" 
+      : "text-foreground"
 
   const [formData, setFormData] = useState({
     name: "",
