@@ -1,5 +1,3 @@
-import { notFound } from "next/navigation"
-import { getRestaurantByAccessId } from "@/lib/auth"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { UtensilsCrossed, Settings, ArrowRight } from "lucide-react"
@@ -11,14 +9,8 @@ interface AdminLandingPageProps {
   }
 }
 
-export default async function AdminLandingPage({ params }: AdminLandingPageProps) {
+export default function AdminLandingPage({ params }: AdminLandingPageProps) {
   const accessId = params.accessId
-
-  const restaurant = await getRestaurantByAccessId(accessId)
-
-  if (!restaurant) {
-    return notFound()
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
@@ -33,7 +25,7 @@ export default async function AdminLandingPage({ params }: AdminLandingPageProps
               <h1 className="text-lg font-semibold text-foreground">Smartable</h1>
             </div>
           </div>
-          <span className="text-xs text-muted-foreground">Access ID: {restaurant.access_id}</span>
+          <span className="text-xs text-muted-foreground">Access ID: {accessId}</span>
         </div>
       </header>
 
@@ -41,7 +33,7 @@ export default async function AdminLandingPage({ params }: AdminLandingPageProps
         <Card className="p-6 md:p-8 mb-6">
           <p className="text-sm text-muted-foreground mb-2">Bienvenido</p>
           <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-            {restaurant.name}
+            Tu restaurante ya está configurado en Smartable
           </h2>
           <p className="text-sm text-muted-foreground mb-4">
             Tu restaurante ya está registrado en Smartable. Desde aquí podrás configurar tu
@@ -66,19 +58,12 @@ export default async function AdminLandingPage({ params }: AdminLandingPageProps
             <Card className="p-4">
               <h3 className="font-semibold mb-1 text-foreground">Información del restaurante</h3>
               <p className="text-xs text-muted-foreground mb-1">
-                Email: <span className="font-medium text-foreground">{restaurant.email}</span>
+                Access ID:{" "}
+                <span className="font-medium text-foreground break-all">{accessId}</span>
               </p>
-              {restaurant.phone && (
-                <p className="text-xs text-muted-foreground mb-1">
-                  Teléfono: <span className="font-medium text-foreground">{restaurant.phone}</span>
-                </p>
-              )}
-              {restaurant.address && (
-                <p className="text-xs text-muted-foreground">
-                  Dirección:{" "}
-                  <span className="font-medium text-foreground">{restaurant.address}</span>
-                </p>
-              )}
+              <p className="text-xs text-muted-foreground mt-1">
+                Pronto podrás ver y editar aquí los datos de tu restaurante.
+              </p>
             </Card>
           </div>
         </Card>
