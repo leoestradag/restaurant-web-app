@@ -33,7 +33,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { useRestaurant } from "@/lib/restaurant-context"
-import { type Product } from "@/lib/data"
+import { type Product, restaurant } from "@/lib/data"
 import { QRGenerator } from "@/components/qr-generator"
 
 type EditMode = "list" | "edit" | "add" | "scan" | "qr"
@@ -170,13 +170,38 @@ export default function AdminPage() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-10 bg-card border-b border-border px-4 py-3">
-        <div className="flex items-center gap-3">
-          <Link href="/">
-            <Button variant="ghost" size="icon" className="shrink-0">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-          </Link>
-          <h1 className="text-lg font-semibold">Panel de Administración</h1>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Link href="/">
+              <Button variant="ghost" size="icon" className="shrink-0">
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-lg font-semibold">Panel de Administración</h1>
+              <p className="text-xs text-muted-foreground">
+                Gestiona el menú y las mesas de tu restaurante
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="relative h-8 w-8 rounded-full overflow-hidden bg-muted">
+              <Image
+                src={restaurant.logo}
+                alt={restaurant.name}
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm font-medium leading-tight">
+                {restaurant.name}
+              </span>
+              <span className="text-[10px] text-muted-foreground leading-tight">
+                Vista del administrador
+              </span>
+            </div>
+          </div>
         </div>
       </header>
 
