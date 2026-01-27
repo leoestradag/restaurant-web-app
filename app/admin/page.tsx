@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowLeft, Plus, Scan, Pencil, Trash2, Upload, Loader2, Check, QrCode } from "lucide-react"
+import { ArrowLeft, Plus, Scan, Pencil, Trash2, Upload, Loader2, Check, QrCode, Eye } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -182,6 +182,18 @@ export default function AdminPage() {
 
       <main className="px-4 py-4 pb-24">
         {/* Action Buttons */}
+        <div className="mb-4">
+          <Button
+            asChild
+            variant="outline"
+            className="w-full"
+          >
+            <Link href="/restaurant/SMARTABLE-REST-001">
+              <Eye className="w-4 h-4 mr-2" />
+              Ver como cliente
+            </Link>
+          </Button>
+        </div>
         <div className="grid grid-cols-3 gap-3 mb-6">
           <Button
             onClick={() => setMode("qr")}

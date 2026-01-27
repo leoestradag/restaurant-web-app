@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { UtensilsCrossed, Settings, ArrowRight } from "lucide-react"
+import { UtensilsCrossed, Settings, ArrowRight, Eye } from "lucide-react"
 import Link from "next/link"
 
 interface AdminLandingPageProps {
@@ -51,6 +51,19 @@ export default function AdminLandingPage({ params }: AdminLandingPageProps) {
                 <Link href="/admin">
                   Ir al panel actual
                   <ArrowRight className="h-4 w-4 ml-2" />
+                </Link>
+              </Button>
+            </Card>
+
+            <Card className="p-4 bg-accent/5 border-accent/20">
+              <h3 className="font-semibold mb-1 text-foreground">Vista del cliente</h3>
+              <p className="text-xs text-muted-foreground mb-3">
+                Ve cómo se ve tu restaurante desde la perspectiva de tus clientes.
+              </p>
+              <Button asChild variant="outline" className="w-full">
+                <Link href={`/restaurant/${accessId}`}>
+                  <Eye className="h-4 w-4 mr-2" />
+                  Ver como cliente
                 </Link>
               </Button>
             </Card>
