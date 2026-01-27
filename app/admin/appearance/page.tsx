@@ -254,10 +254,10 @@ export default function AppearancePage() {
                     : "border-border hover:border-primary/40"
                 }`}
               >
-                <p className={`text-sm font-medium ${font.className}`}>
+                <p className={`text-sm font-medium text-red-600 ${font.className}`}>
                   {font.name}
                 </p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-red-500">
                   {font.description}
                 </p>
               </button>
