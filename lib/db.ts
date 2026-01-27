@@ -15,16 +15,13 @@ function getSql() {
   return sqlInstance
 }
 
-// Exportar función que se inicializa solo cuando se usa
-export const sql = new Proxy({} as ReturnType<typeof neon>, {
-  get(_target, prop) {
-    const instance = getSql()
-    const value = (instance as any)[prop]
-    return typeof value === "function" ? value.bind(instance) : value
-  },
-  apply(_target, _thisArg, argumentsList) {
-    const instance = getSql()
-    return (instance as any)(...argumentsList)
-  },
-}) as ReturnType<typeof neon>
+// Crear sql como función tagged template que se inicializa solo cuando se llama
+// Esto evita que falle durante el build de Next.js
+const sqlFunction = (strings: TemplateStringsArray, ...values: any[]) => {
+  return getSql()(strings, ...values)
+}
 
+// Hacer que sql sea compatible con tagged templates y también como objeto
+export const sql = Object.assign(sqlFunction, {
+  query: (...args: any[]) => getSql().query(...args),
+}) as ReturnType<typeof neon>
