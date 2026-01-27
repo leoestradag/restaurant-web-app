@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ArrowLeft, Plus, Scan, Pencil, Trash2, Upload, Loader2, Check, QrCode, Eye, Palette } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -38,6 +38,8 @@ import { QRGenerator } from "@/components/qr-generator"
 
 type EditMode = "list" | "edit" | "add" | "scan" | "qr"
 
+const THEME_KEY = "smartable-theme"
+
 export default function AdminPage() {
   const { products, categories, addProduct, updateProduct, deleteProduct, setProducts } = useRestaurant()
   const [mode, setMode] = useState<EditMode>("list")
@@ -46,6 +48,37 @@ export default function AdminPage() {
   const [scanning, setScanning] = useState(false)
   const [scanSuccess, setScanSuccess] = useState(false)
   const [activeCategory, setActiveCategory] = useState(categories[0]?.id || "")
+  const [currentTheme, setCurrentTheme] = useState<string>("")
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const theme = window.localStorage.getItem(THEME_KEY) || ""
+      setCurrentTheme(theme)
+      
+      // Escuchar cambios en localStorage
+      const handleStorageChange = () => {
+        const newTheme = window.localStorage.getItem(THEME_KEY) || ""
+        setCurrentTheme(newTheme)
+      }
+      window.addEventListener("storage", handleStorageChange)
+      
+      // También escuchar cambios en la misma ventana
+      const interval = setInterval(() => {
+        const newTheme = window.localStorage.getItem(THEME_KEY) || ""
+        if (newTheme !== currentTheme) {
+          setCurrentTheme(newTheme)
+        }
+      }, 500)
+      
+      return () => {
+        window.removeEventListener("storage", handleStorageChange)
+        clearInterval(interval)
+      }
+    }
+  }, [currentTheme])
+
+  // Determinar si el texto debe ser blanco (solo para temas "gold" y "ocean")
+  const textColorClass = currentTheme === "gold" || currentTheme === "ocean" ? "text-white" : "text-foreground"
 
   const [formData, setFormData] = useState({
     name: "",
@@ -214,8 +247,8 @@ export default function AdminPage() {
             className="w-full"
           >
             <Link href="/restaurant/SMARTABLE-REST-001">
-              <Eye className="w-4 h-4 mr-2 text-white" />
-              <span className="text-white">Ver como cliente</span>
+              <Eye className={`w-4 h-4 mr-2 ${textColorClass}`} />
+              <span className={textColorClass}>Ver como cliente</span>
             </Link>
           </Button>
         </div>
@@ -225,16 +258,16 @@ export default function AdminPage() {
             variant={mode === "qr" ? "default" : "outline"}
             className="h-auto py-4 flex-col gap-2"
           >
-            <QrCode className="w-6 h-6 text-white" />
-            <span className="text-sm text-white">Códigos QR</span>
+            <QrCode className={`w-6 h-6 ${textColorClass}`} />
+            <span className={`text-sm ${textColorClass}`}>Códigos QR</span>
           </Button>
           <Button
             onClick={() => setMode("scan")}
             variant="outline"
             className="h-auto py-4 flex-col gap-2"
           >
-            <Scan className="w-6 h-6 text-white" />
-            <span className="text-sm text-white">Escanear Menú</span>
+            <Scan className={`w-6 h-6 ${textColorClass}`} />
+            <span className={`text-sm ${textColorClass}`}>Escanear Menú</span>
           </Button>
           <Button
             onClick={handleAdd}
@@ -249,8 +282,8 @@ export default function AdminPage() {
             className="h-auto py-4 flex-col gap-2"
           >
             <Link href="/admin/appearance">
-              <Palette className="w-6 h-6 text-white" />
-              <span className="text-sm text-white">Mi Restaurante</span>
+              <Palette className={`w-6 h-6 ${textColorClass}`} />
+              <span className={`text-sm ${textColorClass}`}>Mi Restaurante</span>
             </Link>
           </Button>
         </div>
