@@ -172,7 +172,7 @@ export default function AdminPage() {
       <header className="sticky top-0 z-10 bg-card border-b border-border px-4 py-3">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <Link href="/">
+            <Link href="/restaurant/SMARTABLE-REST-001/admin">
               <Button variant="ghost" size="icon" className="shrink-0">
                 <ArrowLeft className="w-5 h-5" />
               </Button>
