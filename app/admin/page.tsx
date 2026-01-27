@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowLeft, Plus, Scan, Pencil, Trash2, Upload, Loader2, Check, QrCode, Eye } from "lucide-react"
+import { ArrowLeft, Plus, Scan, Pencil, Trash2, Upload, Loader2, Check, QrCode, Eye, Palette } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -219,7 +219,7 @@ export default function AdminPage() {
             </Link>
           </Button>
         </div>
-        <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className="grid grid-cols-4 gap-3 mb-6">
           <Button
             onClick={() => setMode("qr")}
             variant={mode === "qr" ? "default" : "outline"}
@@ -242,6 +242,16 @@ export default function AdminPage() {
           >
             <Plus className="w-6 h-6" />
             <span className="text-sm">Agregar Platillo</span>
+          </Button>
+          <Button
+            asChild
+            variant="outline"
+            className="h-auto py-4 flex-col gap-2"
+          >
+            <Link href="/admin/appearance">
+              <Palette className="w-6 h-6" />
+              <span className="text-sm">Mi Restaurante</span>
+            </Link>
           </Button>
         </div>
 
