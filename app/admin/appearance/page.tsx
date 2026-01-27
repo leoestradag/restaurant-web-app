@@ -189,11 +189,15 @@ export default function AppearancePage() {
 
       <main className="px-4 py-4 pb-24 max-w-4xl mx-auto space-y-6">
         {/* Preview simple */}
-        <Card className="p-4 flex items-center justify-between">
+        <Card 
+          className="p-4 flex items-center justify-between"
+          style={{ backgroundColor: themes[selectedTheme].vars.background }}
+        >
           <div>
             <p className="text-xs text-muted-foreground mb-1">Vista previa</p>
             <h2
               className={`text-xl font-semibold ${fonts[selectedFont].className}`}
+              style={{ color: themes[selectedTheme].vars.primary }}
             >
               La Tavola
             </h2>
