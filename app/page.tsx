@@ -341,7 +341,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-6 mt-12">
             <Card className="p-6 text-center">
               <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                <Restaurant className="h-6 w-6 text-primary" />
+                <ChefHat className="h-6 w-6 text-primary" />
               </div>
               <h3 className="font-semibold mb-2">Fácil de Usar</h3>
               <p className="text-sm text-muted-foreground">
