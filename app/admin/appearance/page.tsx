@@ -230,8 +230,8 @@ export default function AppearancePage() {
                 <div
                   className={`h-16 w-full rounded-lg mb-2 ${theme.previewClass}`}
                 />
-                <p className="text-sm font-medium">{theme.name}</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm font-medium text-red-600">{theme.name}</p>
+                <p className="text-xs text-red-500">
                   {theme.description}
                 </p>
               </button>
