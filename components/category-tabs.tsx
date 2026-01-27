@@ -26,10 +26,10 @@ export function CategoryTabs({
           type="button"
           onClick={() => onCategoryChange(category.id)}
           className={cn(
-            "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors",
+            "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors border",
             activeCategory === category.id
-              ? "bg-primary text-primary-foreground"
-              : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+              ? "border-primary text-primary bg-transparent"
+              : "border-border text-muted-foreground hover:border-primary/40 hover:text-primary"
           )}
         >
           {category.name}
