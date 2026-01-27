@@ -18,9 +18,9 @@ export function RestaurantHeader() {
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b">
-      <div className="flex items-center justify-between px-4 py-3">
+      <div className="flex items-center justify-between px-4 py-3 max-w-5xl mx-auto">
         <div className="flex items-center gap-3">
-          <div className="relative h-10 w-10 rounded-full overflow-hidden">
+          <div className="relative h-10 w-10 rounded-full overflow-hidden ring-2 ring-primary/40">
             <Image
               src={restaurant.logo || "/placeholder.svg"}
               alt={restaurant.name}
@@ -29,7 +29,9 @@ export function RestaurantHeader() {
             />
           </div>
           <div>
-            <h1 className="font-semibold text-foreground">{restaurant.name}</h1>
+            <h1 className="font-semibold text-foreground leading-tight">
+              {restaurant.name}
+            </h1>
             <p className="text-xs text-muted-foreground">
               Mesa {currentTable}
             </p>
