@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 
 type ThemeId = "warm" | "fresh" | "dark" | "gold" | "ocean"
-type FontId = "rounded" | "serif" | "clean" | "playful" | "compact"
+type FontId = "elegant" | "very-elegant" | "simple" | "healthy" | "creative"
 
 const THEME_KEY = "smartable-theme"
 const FONT_KEY = "smartable-font"
@@ -121,17 +121,31 @@ function applyThemeToDocument(themeId: ThemeId, fontId: FontId) {
   root.style.setProperty("--background", theme.vars.background)
 
   // Reset font classes on root
-  root.classList.remove("font-sans", "font-serif")
-  if (fontId === "serif") {
+  root.classList.remove("font-sans", "font-serif", "italic", "font-light", "font-medium", "font-bold", "tracking-normal", "tracking-wide", "tracking-wider", "tracking-tight", "uppercase")
+  
+  // Apply font-specific classes
+  if (fontId === "elegant" || fontId === "very-elegant") {
     root.classList.add("font-serif")
+    if (fontId === "elegant") {
+      root.classList.add("italic")
+    } else {
+      root.classList.add("font-light", "tracking-wider")
+    }
   } else {
     root.classList.add("font-sans")
+    if (fontId === "healthy") {
+      root.classList.add("font-medium", "tracking-wide")
+    } else if (fontId === "creative") {
+      root.classList.add("font-bold", "tracking-tight", "uppercase")
+    } else {
+      root.classList.add("tracking-normal")
+    }
   }
 }
 
 export default function AppearancePage() {
   const [selectedTheme, setSelectedTheme] = useState<ThemeId>("warm")
-  const [selectedFont, setSelectedFont] = useState<FontId>("rounded")
+  const [selectedFont, setSelectedFont] = useState<FontId>("simple")
   const [initialTheme, setInitialTheme] = useState<ThemeId | null>(null)
   const [initialFont, setInitialFont] = useState<FontId | null>(null)
 
