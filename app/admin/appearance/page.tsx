@@ -148,6 +148,10 @@ export default function AppearancePage() {
   const [selectedFont, setSelectedFont] = useState<FontId>("simple")
   const [initialTheme, setInitialTheme] = useState<ThemeId | null>(null)
   const [initialFont, setInitialFont] = useState<FontId | null>(null)
+  
+  // Asegurar que siempre tengamos valores válidos
+  const currentTheme = themes[selectedTheme] ? selectedTheme : "warm"
+  const currentFont = fonts[selectedFont] ? selectedFont : "simple"
 
   useEffect(() => {
     if (typeof window === "undefined") return
@@ -205,13 +209,13 @@ export default function AppearancePage() {
         {/* Preview simple */}
         <Card 
           className="p-4 flex items-center justify-between"
-          style={{ backgroundColor: themes[selectedTheme].vars.background }}
+          style={{ backgroundColor: themes[currentTheme]?.vars?.background || themes.warm.vars.background }}
         >
           <div>
             <p className="text-xs text-muted-foreground mb-1">Vista previa</p>
             <h2
-              className={`text-xl font-semibold ${fonts[selectedFont].className}`}
-              style={{ color: themes[selectedTheme].vars.primary }}
+              className={`text-xl font-semibold ${fonts[currentFont]?.className || fonts.simple.className}`}
+              style={{ color: themes[currentTheme]?.vars?.primary || themes.warm.vars.primary }}
             >
               La Tavola
             </h2>
@@ -220,7 +224,7 @@ export default function AppearancePage() {
             </p>
           </div>
           <div
-            className={`h-16 w-32 rounded-xl ${themes[selectedTheme].previewClass}`}
+            className={`h-16 w-32 rounded-xl ${themes[currentTheme]?.previewClass || themes.warm.previewClass}`}
           />
         </Card>
 
