@@ -214,8 +214,8 @@ export default function AdminPage() {
             className="w-full"
           >
             <Link href="/restaurant/SMARTABLE-REST-001">
-              <Eye className="w-4 h-4 mr-2 text-foreground" />
-              <span className="text-foreground">Ver como cliente</span>
+              <Eye className="w-4 h-4 mr-2 text-white" />
+              <span className="text-white">Ver como cliente</span>
             </Link>
           </Button>
         </div>
@@ -225,16 +225,16 @@ export default function AdminPage() {
             variant={mode === "qr" ? "default" : "outline"}
             className="h-auto py-4 flex-col gap-2"
           >
-            <QrCode className="w-6 h-6 text-foreground" />
-            <span className="text-sm text-foreground">Códigos QR</span>
+            <QrCode className="w-6 h-6 text-white" />
+            <span className="text-sm text-white">Códigos QR</span>
           </Button>
           <Button
             onClick={() => setMode("scan")}
             variant="outline"
             className="h-auto py-4 flex-col gap-2"
           >
-            <Scan className="w-6 h-6 text-foreground" />
-            <span className="text-sm text-foreground">Escanear Menú</span>
+            <Scan className="w-6 h-6 text-white" />
+            <span className="text-sm text-white">Escanear Menú</span>
           </Button>
           <Button
             onClick={handleAdd}
@@ -249,8 +249,8 @@ export default function AdminPage() {
             className="h-auto py-4 flex-col gap-2"
           >
             <Link href="/admin/appearance">
-              <Palette className="w-6 h-6 text-foreground" />
-              <span className="text-sm text-foreground">Mi Restaurante</span>
+              <Palette className="w-6 h-6 text-white" />
+              <span className="text-sm text-white">Mi Restaurante</span>
             </Link>
           </Button>
         </div>
