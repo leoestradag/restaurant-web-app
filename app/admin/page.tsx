@@ -350,7 +350,7 @@ export default function AdminPage() {
                   />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-foreground truncate">{product.name}</h3>
+                  <h3 className={`font-medium truncate ${textColorClass}`}>{product.name}</h3>
                   <p className="text-sm text-muted-foreground line-clamp-2">
                     {product.description}
                   </p>
