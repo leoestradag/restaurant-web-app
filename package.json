@@ -7,7 +7,7 @@
     "dev": "next dev",
     "lint": "eslint .",
     "start": "next start",
-    "db:init": "tsx scripts/init-db-simple.ts"
+    "db:init": "tsx scripts/create-tables-direct.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

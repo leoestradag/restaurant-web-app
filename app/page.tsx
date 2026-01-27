@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Restaurant, UtensilsCrossed, Sparkles, ArrowRight, LogIn, UserPlus } from "lucide-react"
+import { UtensilsCrossed, Sparkles, ArrowRight, LogIn, UserPlus, ChefHat } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
