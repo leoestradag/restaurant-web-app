@@ -225,10 +225,10 @@ export default function AppearancePage() {
                 key={id}
                 type="button"
                 onClick={() => setSelectedTheme(id as ThemeId)}
-                className={`text-left rounded-xl border p-3 space-y-2 transition-all ${
+                className={`text-left rounded-xl border-2 p-3 space-y-2 transition-all shadow-md hover:shadow-lg ${
                   selectedTheme === id
-                    ? "border-primary ring-1 ring-primary/50 bg-primary/5"
-                    : "border-border hover:border-primary/40"
+                    ? "border-primary ring-2 ring-primary/50 bg-primary/5 shadow-lg scale-105"
+                    : "border-border hover:border-primary/40 hover:shadow-lg"
                 }`}
               >
                 <div
@@ -252,10 +252,10 @@ export default function AppearancePage() {
                 key={id}
                 type="button"
                 onClick={() => setSelectedFont(id as FontId)}
-                className={`text-left rounded-xl border p-3 space-y-1 transition-all ${
+                className={`text-left rounded-xl border-2 p-3 space-y-1 transition-all shadow-md hover:shadow-lg ${
                   selectedFont === id
-                    ? "border-primary ring-1 ring-primary/50 bg-primary/5"
-                    : "border-border hover:border-primary/40"
+                    ? "border-primary ring-2 ring-primary/50 bg-primary/5 shadow-lg scale-105"
+                    : "border-border hover:border-primary/40 hover:shadow-lg"
                 }`}
               >
                 <p className={`text-sm font-medium text-red-600 ${font.className}`}>
