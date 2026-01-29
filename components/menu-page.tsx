@@ -1,18 +1,43 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { RestaurantHeader } from "./restaurant-header"
 import { CategoryTabs } from "./category-tabs"
 import { ProductCard } from "./product-card"
 import { ProductDetailModal } from "./product-detail-modal"
+import { CustomerAuthModal } from "./customer-auth-modal"
 import { type Product } from "@/lib/data"
 import { useRestaurant } from "@/lib/restaurant-context"
 import { OwnerBanner } from "./owner-banner"
+
+const AUTH_MODAL_KEY = "customer-auth-seen"
 
 export function MenuPage() {
   const { products, categories } = useRestaurant()
   const [activeCategory, setActiveCategory] = useState(categories[0]?.id || "")
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [showAuthModal, setShowAuthModal] = useState(false)
+
+  useEffect(() => {
+    // Mostrar el modal solo si no se ha visto antes en esta sesión
+    if (typeof window !== "undefined") {
+      const hasSeenModal = sessionStorage.getItem(AUTH_MODAL_KEY)
+      if (!hasSeenModal) {
+        setShowAuthModal(true)
+      }
+    }
+  }, [])
+
+  const handleCloseModal = () => {
+    setShowAuthModal(false)
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem(AUTH_MODAL_KEY, "true")
+    }
+  }
+
+  const handleGuestContinue = () => {
+    handleCloseModal()
+  }
 
   const filteredProducts = products.filter(
     (product) => product.category === activeCategory
@@ -41,6 +66,11 @@ export function MenuPage() {
         product={selectedProduct}
         open={!!selectedProduct}
         onClose={() => setSelectedProduct(null)}
+      />
+      <CustomerAuthModal
+        open={showAuthModal}
+        onClose={handleCloseModal}
+        onGuestContinue={handleGuestContinue}
       />
       <OwnerBanner />
     </div>
