@@ -169,10 +169,12 @@ export default function AppearancePage() {
     }
   }, [])
 
+  // El botón se habilita si:
+  // 1. Hay valores iniciales Y hay cambios, O
+  // 2. No hay valores iniciales (primera vez) Y hay selecciones válidas
   const hasChanges =
-    initialTheme !== null &&
-    initialFont !== null &&
-    (selectedTheme !== initialTheme || selectedFont !== initialFont)
+    (initialTheme !== null && initialFont !== null && (selectedTheme !== initialTheme || selectedFont !== initialFont)) ||
+    (initialTheme === null && initialFont === null && selectedTheme && selectedFont)
 
   const handleSave = () => {
     if (typeof window === "undefined") return
