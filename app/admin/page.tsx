@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowLeft, Plus, Scan, Pencil, Trash2, Upload, Loader2, Check, QrCode, Eye, Palette } from "lucide-react"
+import { ArrowLeft, Plus, Scan, Pencil, Trash2, Upload, Loader2, Check, QrCode, Eye, Palette, BarChart3 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -260,41 +260,51 @@ export default function AdminPage() {
             </Link>
           </Button>
         </div>
-        <div className="grid grid-cols-4 gap-3 mb-6">
-          <Button
-            onClick={() => setMode("qr")}
-            variant={mode === "qr" ? "default" : "outline"}
-            className="h-auto py-4 flex-col gap-2"
-          >
-            <QrCode className={`w-6 h-6 ${textColorClass}`} />
-            <span className={`text-sm ${textColorClass}`}>Códigos QR</span>
-          </Button>
-          <Button
-            onClick={() => setMode("scan")}
-            variant="outline"
-            className="h-auto py-4 flex-col gap-2"
-          >
-            <Scan className={`w-6 h-6 ${textColorClass}`} />
-            <span className={`text-sm ${textColorClass}`}>Escanear Menú</span>
-          </Button>
-          <Button
-            onClick={handleAdd}
-            className="h-auto py-4 flex-col gap-2"
-          >
-            <Plus className="w-6 h-6" />
-            <span className="text-sm">Agregar Platillo</span>
-          </Button>
-          <Button
-            asChild
-            variant="outline"
-            className="h-auto py-4 flex-col gap-2"
-          >
-            <Link href="/admin/appearance">
-              <Palette className={`w-6 h-6 ${textColorClass}`} />
-              <span className={`text-sm ${textColorClass}`}>Mi Restaurante</span>
-            </Link>
-          </Button>
-        </div>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+                <Button
+                  asChild
+                  variant="outline"
+                  className="h-auto py-4 flex-col gap-2"
+                >
+                  <Link href="/admin/dashboard">
+                    <BarChart3 className={`w-6 h-6 ${textColorClass}`} />
+                    <span className={`text-sm ${textColorClass}`}>Dashboard</span>
+                  </Link>
+                </Button>
+                <Button
+                  onClick={() => setMode("qr")}
+                  variant={mode === "qr" ? "default" : "outline"}
+                  className="h-auto py-4 flex-col gap-2"
+                >
+                  <QrCode className={`w-6 h-6 ${textColorClass}`} />
+                  <span className={`text-sm ${textColorClass}`}>Códigos QR</span>
+                </Button>
+                <Button
+                  onClick={() => setMode("scan")}
+                  variant="outline"
+                  className="h-auto py-4 flex-col gap-2"
+                >
+                  <Scan className={`w-6 h-6 ${textColorClass}`} />
+                  <span className={`text-sm ${textColorClass}`}>Escanear Menú</span>
+                </Button>
+                <Button
+                  onClick={handleAdd}
+                  className="h-auto py-4 flex-col gap-2"
+                >
+                  <Plus className="w-6 h-6" />
+                  <span className="text-sm">Agregar Platillo</span>
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  className="h-auto py-4 flex-col gap-2"
+                >
+                  <Link href="/admin/appearance">
+                    <Palette className={`w-6 h-6 ${textColorClass}`} />
+                    <span className={`text-sm ${textColorClass}`}>Mi Restaurante</span>
+                  </Link>
+                </Button>
+              </div>
 
         {/* QR Generator View */}
         {mode === "qr" && (
