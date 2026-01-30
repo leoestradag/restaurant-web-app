@@ -6,6 +6,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const restaurantId = searchParams.get("restaurant_id")
     const date = searchParams.get("date") // Format: YYYY-MM-DD
+    const period = searchParams.get("period") || "day" // day, month, year
 
     if (!restaurantId) {
       return NextResponse.json(
@@ -14,10 +15,31 @@ export async function GET(request: Request) {
       )
     }
 
-    // Get orders for the specified date (or today if not specified)
-    const targetDate = date || new Date().toISOString().split("T")[0]
-    const startDate = `${targetDate} 00:00:00`
-    const endDate = `${targetDate} 23:59:59`
+    // Calculate date range based on period
+    let startDate: string
+    let endDate: string
+    const targetDate = date ? new Date(date) : new Date()
+
+    if (period === "day") {
+      const dateStr = date || targetDate.toISOString().split("T")[0]
+      startDate = `${dateStr} 00:00:00`
+      endDate = `${dateStr} 23:59:59`
+    } else if (period === "month") {
+      const year = targetDate.getFullYear()
+      const month = targetDate.getMonth()
+      startDate = `${year}-${String(month + 1).padStart(2, "0")}-01 00:00:00`
+      const lastDay = new Date(year, month + 1, 0).getDate()
+      endDate = `${year}-${String(month + 1).padStart(2, "0")}-${String(lastDay).padStart(2, "0")} 23:59:59`
+    } else if (period === "year") {
+      const year = targetDate.getFullYear()
+      startDate = `${year}-01-01 00:00:00`
+      endDate = `${year}-12-31 23:59:59`
+    } else {
+      // Default to day
+      const dateStr = targetDate.toISOString().split("T")[0]
+      startDate = `${dateStr} 00:00:00`
+      endDate = `${dateStr} 23:59:59`
+    }
 
     // Get orders for the day
     const orders = (await sql`
@@ -42,8 +64,8 @@ export async function GET(request: Request) {
       ORDER BY o.created_at DESC
     `) as any[]
 
-    // Calculate daily totals
-    const dailyStats = orders.reduce(
+    // Calculate period totals
+    const periodStats = orders.reduce(
       (acc, order) => {
         acc.totalRevenue += Number(order.total) || 0
         acc.totalOrders += 1
@@ -71,7 +93,8 @@ export async function GET(request: Request) {
         createdAt: order.created_at,
         itemCount: Number(order.item_count),
       })),
-      stats: dailyStats,
+      stats: periodStats,
+      period,
     })
   } catch (error: any) {
     console.error("Error fetching orders:", error)

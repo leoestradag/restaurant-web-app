@@ -6,8 +6,16 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { useRestaurant } from "@/lib/restaurant-context"
 import { restaurant } from "@/lib/data"
+import { cn } from "@/lib/utils"
 
 interface Order {
   id: string
@@ -23,21 +31,24 @@ interface Order {
   itemCount: number
 }
 
-interface DailyStats {
+interface PeriodStats {
   totalRevenue: number
   totalOrders: number
   totalItems: number
 }
 
+type Period = "day" | "month" | "year"
+
 export default function DashboardPage() {
   const { restaurant: restaurantContext } = useRestaurant()
   const [orders, setOrders] = useState<Order[]>([])
-  const [stats, setStats] = useState<DailyStats>({
+  const [stats, setStats] = useState<PeriodStats>({
     totalRevenue: 0,
     totalOrders: 0,
     totalItems: 0,
   })
   const [loading, setLoading] = useState(true)
+  const [selectedPeriod, setSelectedPeriod] = useState<Period>("day")
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
   )
@@ -47,13 +58,13 @@ export default function DashboardPage() {
 
   useEffect(() => {
     fetchOrders()
-  }, [selectedDate])
+  }, [selectedDate, selectedPeriod])
 
   const fetchOrders = async () => {
     try {
       setLoading(true)
       const response = await fetch(
-        `/api/orders?restaurant_id=${restaurantId}&date=${selectedDate}`
+        `/api/orders?restaurant_id=${restaurantId}&date=${selectedDate}&period=${selectedPeriod}`
       )
       const data = await response.json()
 
@@ -74,6 +85,51 @@ export default function DashboardPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const getPeriodLabel = () => {
+    const date = new Date(selectedDate)
+    if (selectedPeriod === "day") {
+      return date.toLocaleDateString("es-ES", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    } else if (selectedPeriod === "month") {
+      return date.toLocaleDateString("es-ES", {
+        year: "numeric",
+        month: "long",
+      })
+    } else {
+      return date.getFullYear().toString()
+    }
+  }
+
+  const getDateInputType = () => {
+    if (selectedPeriod === "day") return "date"
+    if (selectedPeriod === "month") return "month"
+    return "number" // year
+  }
+
+  const handleDateChange = (value: string) => {
+    if (selectedPeriod === "year") {
+      // For year, we need to set the date to January 1st of that year
+      setSelectedDate(`${value}-01-01`)
+    } else {
+      setSelectedDate(value)
+    }
+  }
+
+  const getDateValue = () => {
+    if (selectedPeriod === "year") {
+      return new Date(selectedDate).getFullYear().toString()
+    }
+    if (selectedPeriod === "month") {
+      const date = new Date(selectedDate)
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`
+    }
+    return selectedDate
   }
 
   const formatDate = (dateString: string) => {
@@ -113,12 +169,34 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Input
-              type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="w-40"
-            />
+            <Select value={selectedPeriod} onValueChange={(value) => setSelectedPeriod(value as Period)}>
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="day">Día</SelectItem>
+                <SelectItem value="month">Mes</SelectItem>
+                <SelectItem value="year">Año</SelectItem>
+              </SelectContent>
+            </Select>
+            {selectedPeriod === "year" ? (
+              <Input
+                type="number"
+                value={getDateValue()}
+                onChange={(e) => handleDateChange(e.target.value)}
+                className="w-24"
+                placeholder="Año"
+                min="2020"
+                max="2100"
+              />
+            ) : (
+              <Input
+                type={getDateInputType()}
+                value={getDateValue()}
+                onChange={(e) => handleDateChange(e.target.value)}
+                className="w-40"
+              />
+            )}
           </div>
         </div>
       </header>
@@ -133,7 +211,9 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">Ingresos del Día</p>
+              <p className="text-sm text-muted-foreground">
+                Ingresos del {selectedPeriod === "day" ? "Día" : selectedPeriod === "month" ? "Mes" : "Año"}
+              </p>
               <p className="text-2xl font-bold text-foreground">
                 {formatCurrency(stats.totalRevenue)}
               </p>
@@ -150,7 +230,9 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">Órdenes del Día</p>
+              <p className="text-sm text-muted-foreground">
+                Órdenes del {selectedPeriod === "day" ? "Día" : selectedPeriod === "month" ? "Mes" : "Año"}
+              </p>
               <p className="text-2xl font-bold text-foreground">
                 {stats.totalOrders}
               </p>
@@ -185,17 +267,12 @@ export default function DashboardPage() {
         {/* Orders List */}
         <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Órdenes del Día</h2>
+            <h2 className="text-lg font-semibold">
+              Órdenes del {selectedPeriod === "day" ? "Día" : selectedPeriod === "month" ? "Mes" : "Año"}
+            </h2>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Calendar className="h-4 w-4" />
-              <span>
-                {new Date(selectedDate).toLocaleDateString("es-ES", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </span>
+              <span>{getPeriodLabel()}</span>
             </div>
           </div>
 
