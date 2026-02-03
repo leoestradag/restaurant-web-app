@@ -264,19 +264,9 @@ export default function PaymentPage() {
       <Dialog open={showSplitOptions} onOpenChange={setShowSplitOptions}>
         <DialogContent className="sm:max-w-md p-0 gap-0">
           <DialogHeader className="px-6 pt-6 pb-4 border-b">
-            <div className="flex items-center justify-between">
-              <DialogTitle className="text-xl font-bold">
-                Dividir la cuenta
-              </DialogTitle>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={() => setShowSplitOptions(false)}
-              >
-                <X className="h-5 w-5" />
-              </Button>
-            </div>
+            <DialogTitle className="text-xl font-bold">
+              Dividir la cuenta
+            </DialogTitle>
           </DialogHeader>
           <div className="p-6 space-y-3">
             <Button

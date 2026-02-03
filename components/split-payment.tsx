@@ -233,3 +233,4 @@ export function SplitPayment({ items, subtotal, tax, onSplitChange }: SplitPayme
   )
 }
 
+

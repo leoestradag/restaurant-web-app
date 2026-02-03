@@ -12,3 +12,4 @@ export default function RestaurantPage({ params }: RestaurantPageProps) {
   return <MenuPage />
 }
 
+
