@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { ArrowLeft, ChevronDown, X, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -27,6 +27,8 @@ const tipOptions = [
   { id: "25", label: "25%", value: 0.25, emoji: "❤️", popular: true },
 ]
 
+const RESTAURANT_ACCESS_ID_KEY = "restaurant-access-id"
+
 export default function PaymentPage() {
   const { items, subtotal, tax, total, clearCart } = useCart()
   const { tableNumber } = useTable()
@@ -36,6 +38,36 @@ export default function PaymentPage() {
   const [selectedTip, setSelectedTip] = useState<string | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
+  const [restaurantAccessId, setRestaurantAccessId] = useState<string | null>(null)
+
+  // Obtener el accessId del restaurante desde localStorage o desde la URL
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      // Intentar obtener desde localStorage
+      const storedAccessId = localStorage.getItem(RESTAURANT_ACCESS_ID_KEY)
+      if (storedAccessId) {
+        setRestaurantAccessId(storedAccessId)
+      } else {
+        // Si no está en localStorage, intentar obtenerlo desde la URL de referencia
+        // o desde document.referrer
+        const referrer = document.referrer
+        if (referrer) {
+          try {
+            const url = new URL(referrer)
+            const pathParts = url.pathname.split("/")
+            const accessIdIndex = pathParts.indexOf("restaurant")
+            if (accessIdIndex !== -1 && pathParts[accessIdIndex + 1]) {
+              const accessId = pathParts[accessIdIndex + 1]
+              setRestaurantAccessId(accessId)
+              localStorage.setItem(RESTAURANT_ACCESS_ID_KEY, accessId)
+            }
+          } catch (e) {
+            // Si no se puede parsear, usar un valor por defecto o null
+          }
+        }
+      }
+    }
+  }, [])
 
   // Calculate restaurant surcharge
   const restaurantSurcharge = subtotal * RESTAURANT_SURCHARGE_RATE
@@ -62,6 +94,15 @@ export default function PaymentPage() {
     clearCart()
   }
 
+  // Construir la URL de regreso al menú
+  const getMenuUrl = () => {
+    if (restaurantAccessId) {
+      return `/restaurant/${restaurantAccessId}`
+    }
+    // Fallback: intentar obtener desde la URL actual o usar "/"
+    return "/"
+  }
+
   if (isComplete) {
     return (
       <div className="min-h-screen bg-[#FAF9F6] flex flex-col items-center justify-center p-4 text-center">
@@ -75,7 +116,7 @@ export default function PaymentPage() {
           Gracias por tu orden. ¡Disfruta tu comida!
         </p>
         <Button asChild>
-          <Link href="/">Volver al Menú</Link>
+          <Link href={getMenuUrl()}>Volver al Menú</Link>
         </Button>
       </div>
     )
