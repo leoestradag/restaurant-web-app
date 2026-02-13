@@ -6,6 +6,7 @@ import { CartProvider } from "@/lib/cart-context"
 import { RestaurantProvider } from "@/lib/restaurant-context"
 import { TableProvider } from "@/lib/table-context"
 import { PaymentMethodsProvider } from "@/lib/payment-methods-context"
+import { Toaster } from "@/components/ui/sonner"
 import "./globals.css"
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -52,6 +53,7 @@ export default function RootLayout({
           </RestaurantProvider>
         </TableProvider>
         <Analytics />
+        <Toaster />
       </body>
     </html>
   )

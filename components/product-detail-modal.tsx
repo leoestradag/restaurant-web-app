@@ -2,7 +2,9 @@
 
 import { useState } from "react"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 import { Minus, Plus, X } from "lucide-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -25,6 +27,7 @@ export function ProductDetailModal({
   onClose,
 }: ProductDetailModalProps) {
   const [quantity, setQuantity] = useState(1)
+  const router = useRouter()
   const { addItem } = useCart()
 
   const handleClose = () => {
@@ -35,6 +38,13 @@ export function ProductDetailModal({
   const handleAddToCart = () => {
     if (product) {
       addItem(product, quantity)
+      toast.success(`${quantity}x ${product.name} agregado al carrito`, {
+        description: "Puedes ver tu pedido en el carrito de compras",
+        action: {
+          label: "Ver carrito",
+          onClick: () => router.push("/cart")
+        }
+      })
       handleClose()
     }
   }
