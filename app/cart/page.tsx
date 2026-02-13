@@ -51,25 +51,38 @@ export default function CartPage() {
       </main>
 
       {items.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t p-4 space-y-4">
-          <Card className="p-4 space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span className="text-foreground">${subtotal.toFixed(2)}</span>
+        <div className="fixed bottom-0 left-0 right-0 z-50">
+          {/* Glassmorphism panel */}
+          <div className="bg-background/80 backdrop-blur-xl border-t shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.1)] pb-8 pt-4 px-6 rounded-t-3xl">
+            <div className="max-w-md mx-auto space-y-4">
+
+              {/* Resumen de carrito colapsable - Más sutil */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center text-sm text-muted-foreground/80">
+                  <span>Subtotal</span>
+                  <span>${subtotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between items-center text-sm text-muted-foreground/80">
+                  <span>Tax (8%)</span>
+                  <span>${tax.toFixed(2)}</span>
+                </div>
+              </div>
+
+              {/* Total Destacado */}
+              <div className="flex justify-between items-end pt-2 border-t border-border/50">
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Total a pagar</span>
+                  <span className="text-3xl font-bold text-foreground tracking-tight">${total.toFixed(2)}</span>
+                </div>
+                <Button className="w-full h-14 text-lg font-semibold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 rounded-xl max-w-[50%]" asChild>
+                  <Link href="/payment">
+                    Pay Now
+                    <span className="ml-2 opacity-80">→</span>
+                  </Link>
+                </Button>
+              </div>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Tax</span>
-              <span className="text-foreground">${tax.toFixed(2)}</span>
-            </div>
-            <Separator />
-            <div className="flex justify-between font-semibold">
-              <span className="text-foreground">Total</span>
-              <span className="text-foreground">${total.toFixed(2)}</span>
-            </div>
-          </Card>
-          <Button className="w-full h-12 text-base" asChild>
-            <Link href="/payment">Pay Now</Link>
-          </Button>
+          </div>
         </div>
       )}
     </div>
