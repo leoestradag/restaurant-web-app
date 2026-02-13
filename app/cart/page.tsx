@@ -25,7 +25,7 @@ export default function CartPage() {
         </div>
       </header>
 
-      <main className="px-4 py-4 pb-32">
+      <main className="px-4 py-4 pb-60">
         {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
@@ -51,7 +51,7 @@ export default function CartPage() {
       </main>
 
       {items.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 space-y-4">
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t p-4 space-y-4">
           <Card className="p-4 space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Subtotal</span>
