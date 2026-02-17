@@ -21,7 +21,24 @@ export default function CartPage() {
   useEffect(() => {
     // Recuperar el accessId del restaurante para volver al menú correcto
     if (typeof window !== "undefined") {
-      const accessId = localStorage.getItem("restaurant-access-id")
+      let accessId = localStorage.getItem("restaurant-access-id")
+
+      // Si no hay ID en storage, intentar recuperar del referrer
+      if (!accessId && document.referrer) {
+        try {
+          const url = new URL(document.referrer)
+          const pathParts = url.pathname.split("/")
+          const accessIdIndex = pathParts.indexOf("restaurant")
+          if (accessIdIndex !== -1 && pathParts[accessIdIndex + 1]) {
+            accessId = pathParts[accessIdIndex + 1]
+            // Guardar para uso futuro
+            localStorage.setItem("restaurant-access-id", accessId)
+          }
+        } catch (e) {
+          // Ignorar errores de parsing
+        }
+      }
+
       if (accessId) {
         setMenuUrl(`/restaurant/${accessId}${tableNumber ? `?table=${tableNumber}` : ""}`)
       }
