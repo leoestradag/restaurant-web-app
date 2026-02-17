@@ -128,9 +128,9 @@ export default function PaymentPage() {
       <header className="sticky top-0 z-50 bg-white border-b">
         <div className="flex items-center gap-3 px-4 py-3">
           <Button variant="ghost" size="icon" asChild>
-            <Link href={getMenuUrl()}>
+            <Link href="/cart">
               <ArrowLeft className="h-5 w-5" />
-              <span className="sr-only">Volver al menú</span>
+              <span className="sr-only">Volver al carrito</span>
             </Link>
           </Button>
           <h1 className="font-semibold text-lg text-foreground">Pago</h1>
