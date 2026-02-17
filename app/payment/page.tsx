@@ -97,7 +97,7 @@ export default function PaymentPage() {
   // Construir la URL de regreso al menú
   const getMenuUrl = () => {
     if (restaurantAccessId) {
-      return `/restaurant/${restaurantAccessId}`
+      return `/restaurant/${restaurantAccessId}${tableNumber ? `?table=${tableNumber}` : ""}`
     }
     // Fallback: intentar obtener desde la URL actual o usar "/"
     return "/"
@@ -128,9 +128,9 @@ export default function PaymentPage() {
       <header className="sticky top-0 z-50 bg-white border-b">
         <div className="flex items-center gap-3 px-4 py-3">
           <Button variant="ghost" size="icon" asChild>
-            <Link href="/cart">
+            <Link href={getMenuUrl()}>
               <ArrowLeft className="h-5 w-5" />
-              <span className="sr-only">Volver</span>
+              <span className="sr-only">Volver al menú</span>
             </Link>
           </Button>
           <h1 className="font-semibold text-lg text-foreground">Pago</h1>
