@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { ArrowLeft, ShoppingBag } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -7,19 +8,48 @@ import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { CartItem } from "@/components/cart-item"
 import { useCart } from "@/lib/cart-context"
+import { useTable } from "@/lib/table-context"
+
+import { useRouter } from "next/navigation"
 
 export default function CartPage() {
+  const router = useRouter()
   const { items, subtotal, tax, total } = useCart()
+  const { tableNumber } = useTable()
+  const [menuUrl, setMenuUrl] = useState<string | null>(null)
+
+  useEffect(() => {
+    // Recuperar el accessId del restaurante para volver al menú correcto
+    if (typeof window !== "undefined") {
+      const accessId = localStorage.getItem("restaurant-access-id")
+      if (accessId) {
+        setMenuUrl(`/restaurant/${accessId}${tableNumber ? `?table=${tableNumber}` : ""}`)
+      }
+    }
+  }, [tableNumber])
+
+  const handleBack = () => {
+    if (menuUrl) {
+      router.push(menuUrl)
+    } else {
+      // Si no hay URL del menú (ej. acceso directo/refresh sin historial), intentar volver atrás
+      // Si history.length > 2 significa que hay historial para volver.
+      if (window.history.length > 2) {
+        router.back()
+      } else {
+        // Fallback final al home si no hay nada más
+        router.push("/")
+      }
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b">
         <div className="flex items-center gap-3 px-4 py-3">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/">
-              <ArrowLeft className="h-5 w-5" />
-              <span className="sr-only">Go back</span>
-            </Link>
+          <Button variant="ghost" size="icon" onClick={handleBack}>
+            <ArrowLeft className="h-5 w-5" />
+            <span className="sr-only">Go back to menu</span>
           </Button>
           <h1 className="font-semibold text-lg text-foreground">Your Order</h1>
         </div>
@@ -38,7 +68,7 @@ export default function CartPage() {
               Add some delicious items to get started
             </p>
             <Button asChild className="mt-6">
-              <Link href="/">Browse Menu</Link>
+              <Link href={menuUrl || "/"}>Browse Menu</Link>
             </Button>
           </div>
         ) : (
