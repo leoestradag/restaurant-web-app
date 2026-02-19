@@ -46,17 +46,18 @@ export default function CartPage() {
   }, [tableNumber])
 
   const handleBack = () => {
-    if (menuUrl) {
-      router.push(menuUrl)
+    // Intentar obtener el ID del restaurante directamente de localStorage si el estado aún no está listo
+    // o hubo algún problema con el useEffect
+    const accessId = localStorage.getItem("restaurant-access-id")
+
+    if (accessId) {
+      router.push(`/restaurant/${accessId}${tableNumber ? `?table=${tableNumber}` : ""}`)
+    } else if (document.referrer && document.referrer.includes('/restaurant/')) {
+      // Si no hay ID pero venimos de un restaurante (referrer), volver ahí
+      router.push(document.referrer)
     } else {
-      // Si no hay URL del menú (ej. acceso directo/refresh sin historial), intentar volver atrás
-      // Si history.length > 2 significa que hay historial para volver.
-      if (window.history.length > 2) {
-        router.back()
-      } else {
-        // Fallback final al home si no hay nada más
-        router.push("/")
-      }
+      // Fallback final al home si no hay nada más
+      router.push("/")
     }
   }
 
