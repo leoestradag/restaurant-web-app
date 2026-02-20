@@ -46,8 +46,7 @@ export default function CartPage() {
   }, [tableNumber])
 
   const handleBack = () => {
-    // Intentar obtener el ID del restaurante directamente de localStorage si el estado aún no está listo
-    // o hubo algún problema con el useEffect
+    // Intentar obtener el ID del restaurante directamente de localStorage
     const accessId = localStorage.getItem("restaurant-access-id")
 
     if (accessId) {
@@ -56,8 +55,9 @@ export default function CartPage() {
       // Si no hay ID pero venimos de un restaurante (referrer), volver ahí
       router.push(document.referrer)
     } else {
-      // Fallback final al home si no hay nada más
-      router.push("/")
+      // Fallback específico para el restaurante del usuario si todo lo demás falla
+      // Esto asegura que "la flechita azul" siempre lleve al menú aunque se pierda el contexto
+      router.push("/restaurant/SMARTABLE-REST-001")
     }
   }
 

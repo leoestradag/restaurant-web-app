@@ -11,13 +11,16 @@ interface RestaurantPageProps {
   }
 }
 
-export default function RestaurantPage({ params }: RestaurantPageProps) {
+import { useParams } from "next/navigation"
+
+export default function RestaurantPage() {
+  const params = useParams()
+
   // Guardar el accessId en localStorage para usarlo después del pago
-  // Nota: En Next.js 15+ params es una promesa, pero aquí seguimos usando la prop directa por compatibilidad o
-  // si es < 15. De todas formas, aseguramos que el valor exista.
   useEffect(() => {
     if (typeof window !== "undefined" && params?.accessId) {
-      localStorage.setItem(RESTAURANT_ACCESS_ID_KEY, params.accessId)
+      const accessId = Array.isArray(params.accessId) ? params.accessId[0] : params.accessId
+      localStorage.setItem(RESTAURANT_ACCESS_ID_KEY, accessId)
     }
   }, [params])
 
