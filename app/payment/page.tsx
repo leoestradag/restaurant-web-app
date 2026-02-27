@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { ArrowLeft, ChevronDown, X, Check } from "lucide-react"
+import { ArrowLeft, ChevronDown, X, Check, PenLine } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
@@ -13,7 +13,9 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
 import { EqualSplitModal } from "@/components/equal-split-modal"
 import { ItemSplitModal } from "@/components/item-split-modal"
 import { cn } from "@/lib/utils"
@@ -22,9 +24,9 @@ import { cn } from "@/lib/utils"
 const RESTAURANT_SURCHARGE_RATE = 0.03 // 3%
 
 const tipOptions = [
-  { id: "18", label: "18%", value: 0.18, emoji: "😊" },
-  { id: "20", label: "20%", value: 0.2, emoji: "😘" },
-  { id: "25", label: "25%", value: 0.25, emoji: "❤️" }, // 'popular' is now dynamic
+  { id: "10", label: "10%", value: 0.10, emoji: "😊" },
+  { id: "15", label: "15%", value: 0.15, emoji: "😘" },
+  { id: "20", label: "20%", value: 0.20, emoji: "❤️" }, // 'popular' is now dynamic
 ]
 
 const RESTAURANT_ACCESS_ID_KEY = "restaurant-access-id"
@@ -42,8 +44,13 @@ export default function PaymentPage() {
   const [isComplete, setIsComplete] = useState(false)
   const [restaurantAccessId, setRestaurantAccessId] = useState<string | null>(null)
 
+  // Custom tip states
+  const [showCustomTipModal, setShowCustomTipModal] = useState(false)
+  const [customTipPercentage, setCustomTipPercentage] = useState<string>("")
+  const [isCustomTipActive, setIsCustomTipActive] = useState(false)
+
   // State para almacenar quién es el tip popular basado en datos
-  const [popularTipId, setPopularTipId] = useState<string>("20") // Default to 20% if no data
+  const [popularTipId, setPopularTipId] = useState<string>("15") // Default to 15% if no data
 
   // Obtener el accessId del restaurante desde localStorage o desde la URL
   useEffect(() => {
@@ -99,13 +106,16 @@ export default function PaymentPage() {
 
   // Guardar propina cuando el usuario completa el pago
   const recordTipSelection = () => {
-    if (!selectedTip) return
+    // Si la propina elegida es custom, no la tracking en popular si quieres o puedes agruparla bajo 'custom'
+    const finalSelectionId = isCustomTipActive ? "custom" : selectedTip
+
+    if (!finalSelectionId) return
 
     try {
       const storedTipCounts = localStorage.getItem(TIP_COUNTS_KEY)
       const counts: Record<string, number> = storedTipCounts ? JSON.parse(storedTipCounts) : {}
 
-      counts[selectedTip] = (counts[selectedTip] || 0) + 1
+      counts[finalSelectionId] = (counts[finalSelectionId] || 0) + 1
       localStorage.setItem(TIP_COUNTS_KEY, JSON.stringify(counts))
     } catch (e) {
       console.error("Error saving tip counts:", e)
@@ -119,11 +129,28 @@ export default function PaymentPage() {
   const baseTotal = totalWithSurcharge + finalTax
 
   // Calculate tip
-  const tipValue = selectedTip
-    ? tipOptions.find((t) => t.id === selectedTip)?.value || 0
-    : 0
+  let tipValue = 0
+  if (isCustomTipActive && customTipPercentage) {
+    tipValue = parseFloat(customTipPercentage) / 100
+  } else if (selectedTip) {
+    tipValue = tipOptions.find((t) => t.id === selectedTip)?.value || 0
+  }
+
   const tipAmount = baseTotal * tipValue
   const finalTotal = baseTotal + tipAmount
+
+  const handleSelectPredefinedTip = (id: string) => {
+    setSelectedTip(id)
+    setIsCustomTipActive(false)
+  }
+
+  const handleApplyCustomTip = () => {
+    if (customTipPercentage && !isNaN(parseFloat(customTipPercentage))) {
+      setIsCustomTipActive(true)
+      setSelectedTip(null) // deselecciona los fijos
+      setShowCustomTipModal(false)
+    }
+  }
 
   const handlePayOrSplit = () => {
     setShowSplitOptions(true)
@@ -260,42 +287,64 @@ export default function PaymentPage() {
             <h3 className="text-base font-semibold text-foreground mb-4">
               Da las gracias con una propina
             </h3>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-4 gap-2">
               {tipOptions.map((tip) => {
-                const isSelected = selectedTip === tip.id
+                const isSelected = selectedTip === tip.id && !isCustomTipActive
                 return (
                   <button
                     key={tip.id}
                     type="button"
-                    onClick={() => setSelectedTip(tip.id)}
+                    onClick={() => handleSelectPredefinedTip(tip.id)}
                     className={cn(
-                      "relative p-4 rounded-lg border-2 transition-all",
+                      "relative p-3 rounded-lg border-2 transition-all",
                       isSelected
                         ? "border-black bg-gray-100"
                         : "border-gray-200 bg-white hover:border-gray-300"
                     )}
                   >
                     {tip.id === popularTipId && (
-                      <div className="absolute -top-2 left-2 bg-black text-white text-[10px] font-semibold px-2 py-0.5 rounded">
-                        POPULAR
+                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-black text-white text-[9px] font-semibold px-1.5 py-0.5 rounded whitespace-nowrap">
+                        STAR
                       </div>
                     )}
-                    <div className="flex flex-col items-center gap-2">
+                    <div className="flex flex-col items-center gap-1 mt-1">
                       {isSelected && (
-                        <div className="absolute top-2 right-2">
-                          <Check className="h-5 w-5 text-black" />
+                        <div className="absolute top-1 right-1">
+                          <Check className="h-4 w-4 text-black" />
                         </div>
                       )}
-                      <span className="text-2xl">{tip.emoji}</span>
-                      <span className="text-base font-semibold text-foreground">
+                      <span className="text-xl">{tip.emoji}</span>
+                      <span className="text-sm font-semibold text-foreground">
                         {tip.label}
                       </span>
                     </div>
                   </button>
                 )
               })}
+
+              {/* Custom Tip Button */}
+              <button
+                type="button"
+                onClick={() => setShowCustomTipModal(true)}
+                className={cn(
+                  "relative p-3 rounded-lg border-2 transition-all flex flex-col items-center justify-center gap-1",
+                  isCustomTipActive
+                    ? "border-black bg-gray-100"
+                    : "border-gray-200 bg-white hover:border-gray-300"
+                )}
+              >
+                {isCustomTipActive && (
+                  <div className="absolute top-1 right-1">
+                    <Check className="h-4 w-4 text-black" />
+                  </div>
+                )}
+                <PenLine className="h-6 w-6 text-foreground mb-1" />
+                <span className="text-sm font-semibold text-foreground">
+                  {isCustomTipActive ? `${customTipPercentage}%` : "Otro"}
+                </span>
+              </button>
             </div>
-            {selectedTip && (
+            {(selectedTip || isCustomTipActive) && (
               <div className="mt-4 space-y-1">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">
@@ -418,6 +467,41 @@ export default function PaymentPage() {
           clearCart()
         }}
       />
+
+      {/* Custom Tip Modal */}
+      <Dialog open={showCustomTipModal} onOpenChange={setShowCustomTipModal}>
+        <DialogContent className="sm:max-w-xs">
+          <DialogHeader>
+            <DialogTitle>Propina Personalizada</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="flex items-center gap-2">
+              <Input
+                type="number"
+                inputMode="decimal"
+                min="0"
+                step="0.1"
+                placeholder="Ej. 12"
+                value={customTipPercentage}
+                onChange={(e) => setCustomTipPercentage(e.target.value)}
+                className="text-lg"
+              />
+              <span className="text-xl font-medium text-muted-foreground">%</span>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Ingresa el porcentaje que te gustaría dejar.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCustomTipModal(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleApplyCustomTip} disabled={!customTipPercentage || isNaN(parseFloat(customTipPercentage))}>
+              Aplicar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
