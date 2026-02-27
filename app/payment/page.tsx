@@ -24,10 +24,12 @@ const RESTAURANT_SURCHARGE_RATE = 0.03 // 3%
 const tipOptions = [
   { id: "18", label: "18%", value: 0.18, emoji: "😊" },
   { id: "20", label: "20%", value: 0.2, emoji: "😘" },
-  { id: "25", label: "25%", value: 0.25, emoji: "❤️", popular: true },
+  { id: "25", label: "25%", value: 0.25, emoji: "❤️" }, // 'popular' is now dynamic
 ]
 
 const RESTAURANT_ACCESS_ID_KEY = "restaurant-access-id"
+// Key to store our aggregated tip counts in localStorage
+const TIP_COUNTS_KEY = "smartable-tip-counts"
 
 export default function PaymentPage() {
   const { items, subtotal, tax, total, clearCart } = useCart()
@@ -39,6 +41,9 @@ export default function PaymentPage() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
   const [restaurantAccessId, setRestaurantAccessId] = useState<string | null>(null)
+
+  // State para almacenar quién es el tip popular basado en datos
+  const [popularTipId, setPopularTipId] = useState<string>("20") // Default to 20% if no data
 
   // Obtener el accessId del restaurante desde localStorage o desde la URL
   useEffect(() => {
@@ -66,8 +71,46 @@ export default function PaymentPage() {
           }
         }
       }
+
+      // Cargar la popularidad de propinas desde localStorage
+      try {
+        const storedTipCounts = localStorage.getItem(TIP_COUNTS_KEY)
+        if (storedTipCounts) {
+          const counts: Record<string, number> = JSON.parse(storedTipCounts)
+
+          // Encontrar el tip con mayor count
+          let maxCount = -1
+          let mostPopularId = "20"
+
+          Object.entries(counts).forEach(([id, count]) => {
+            if (count > maxCount) {
+              maxCount = count
+              mostPopularId = id
+            }
+          })
+
+          setPopularTipId(mostPopularId)
+        }
+      } catch (e) {
+        console.error("Error parsing tip counts from localStorage:", e)
+      }
     }
   }, [])
+
+  // Guardar propina cuando el usuario completa el pago
+  const recordTipSelection = () => {
+    if (!selectedTip) return
+
+    try {
+      const storedTipCounts = localStorage.getItem(TIP_COUNTS_KEY)
+      const counts: Record<string, number> = storedTipCounts ? JSON.parse(storedTipCounts) : {}
+
+      counts[selectedTip] = (counts[selectedTip] || 0) + 1
+      localStorage.setItem(TIP_COUNTS_KEY, JSON.stringify(counts))
+    } catch (e) {
+      console.error("Error saving tip counts:", e)
+    }
+  }
 
   // Calculate restaurant surcharge
   const restaurantSurcharge = subtotal * RESTAURANT_SURCHARGE_RATE
@@ -88,6 +131,7 @@ export default function PaymentPage() {
 
   const handleDirectPayment = async () => {
     setIsProcessing(true)
+    recordTipSelection() // Registra el tip antes de pagar
     await new Promise((resolve) => setTimeout(resolve, 2000))
     setIsProcessing(false)
     setIsComplete(true)
@@ -231,7 +275,7 @@ export default function PaymentPage() {
                         : "border-gray-200 bg-white hover:border-gray-300"
                     )}
                   >
-                    {tip.popular && (
+                    {tip.id === popularTipId && (
                       <div className="absolute -top-2 left-2 bg-black text-white text-[10px] font-semibold px-2 py-0.5 rounded">
                         POPULAR
                       </div>
@@ -349,6 +393,7 @@ export default function PaymentPage() {
         total={selectedTip ? finalTotal : baseTotal}
         onConfirm={async () => {
           setIsProcessing(true)
+          recordTipSelection() // Registrar también en pagos divididos
           await new Promise((resolve) => setTimeout(resolve, 2000))
           setIsProcessing(false)
           setIsComplete(true)
@@ -366,6 +411,7 @@ export default function PaymentPage() {
         surcharge={restaurantSurcharge}
         onConfirm={async () => {
           setIsProcessing(true)
+          recordTipSelection() // Registrar también en desglose de cuenta
           await new Promise((resolve) => setTimeout(resolve, 2000))
           setIsProcessing(false)
           setIsComplete(true)
