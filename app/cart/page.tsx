@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator"
 import { CartItem } from "@/components/cart-item"
 import { useCart } from "@/lib/cart-context"
 import { useTable } from "@/lib/table-context"
+import { UpsellModal } from "@/components/upsell-modal"
 
 import { useRouter } from "next/navigation"
 
@@ -17,6 +18,7 @@ export default function CartPage() {
   const { items, subtotal, tax, total } = useCart()
   const { tableNumber } = useTable()
   const [menuUrl, setMenuUrl] = useState<string | null>(null)
+  const [showUpsell, setShowUpsell] = useState(false)
 
   useEffect(() => {
     // Recuperar el accessId del restaurante para volver al menú correcto
@@ -122,17 +124,24 @@ export default function CartPage() {
                   <span className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Total a pagar</span>
                   <span className="text-3xl font-bold text-foreground tracking-tight">${total.toFixed(2)}</span>
                 </div>
-                <Button className="w-full h-14 text-lg font-semibold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 rounded-xl max-w-[50%]" asChild>
-                  <Link href="/payment">
-                    Pay Now
-                    <span className="ml-2 opacity-80">→</span>
-                  </Link>
+                <Button
+                  className="w-full h-14 text-lg font-semibold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 rounded-xl max-w-[50%]"
+                  onClick={() => setShowUpsell(true)}
+                >
+                  Pay Now
+                  <span className="ml-2 opacity-80">→</span>
                 </Button>
               </div>
             </div>
           </div>
         </div>
       )}
+
+      <UpsellModal
+        isOpen={showUpsell}
+        onClose={() => setShowUpsell(false)}
+        onContinueToPayment={() => router.push("/payment")}
+      />
     </div>
   )
 }
