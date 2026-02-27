@@ -27,18 +27,28 @@ export function UpsellModal({ isOpen, onClose, onContinueToPayment }: UpsellModa
     // Efecto para generar recomendaciones cada vez que se abre el modal
     useEffect(() => {
         if (isOpen) {
-            // Filtrar productos que sean postres o bebidas AND que no estén ya en el carrito
+            // Filtrar IDs que ya están en el carrito
             const cartProductIds = new Set(items.map(item => item.id))
 
-            const eligibleUpsells = products.filter(
-                product =>
-                    (product.category === "desserts" || product.category === "drinks" || product.category === "starters") &&
-                    !cartProductIds.has(product.id)
+            // Separar postres y bebidas que no estén en el carrito
+            const availableDesserts = products.filter(
+                p => p.category === "desserts" && !cartProductIds.has(p.id)
+            )
+            const availableDrinks = products.filter(
+                p => p.category === "drinks" && !cartProductIds.has(p.id)
             )
 
-            // Revolver y tomar hasta 3
-            const shuffled = [...eligibleUpsells].sort(() => 0.5 - Math.random())
-            setRecommendations(shuffled.slice(0, 3))
+            // Revolver ambos arrays
+            const shuffledDesserts = [...availableDesserts].sort(() => 0.5 - Math.random())
+            const shuffledDrinks = [...availableDrinks].sort(() => 0.5 - Math.random())
+
+            // Seleccionar hasta 2 postres y 1 bebida
+            const selectedDesserts = shuffledDesserts.slice(0, 2)
+            const selectedDrinks = shuffledDrinks.slice(0, 1)
+
+            // Combinar y establecer recomendaciones
+            const finalRecommendations = [...selectedDesserts, ...selectedDrinks]
+            setRecommendations(finalRecommendations)
         }
     }, [isOpen, items, products])
 
