@@ -12,7 +12,7 @@ import { restaurant } from "@/lib/data"
 export function RestaurantHeader() {
   const { itemCount } = useCart()
   const { tableNumber } = useTable()
-  
+
   // Usar la mesa de la URL si está disponible, sino usar la del data
   const currentTable = tableNumber || restaurant.tableNumber
 
@@ -45,7 +45,7 @@ export function RestaurantHeader() {
                 {itemCount}
               </Badge>
             )}
-            <span className="sr-only">View cart</span>
+            <span className="sr-only">Ver pedido</span>
           </Link>
         </Button>
       </div>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { ArrowLeft, ShoppingBag } from "lucide-react"
+import { ArrowLeft, ShoppingBag, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
@@ -69,9 +69,9 @@ export default function CartPage() {
         <div className="flex items-center gap-3 px-4 py-3">
           <Button variant="ghost" size="icon" onClick={handleBack}>
             <ArrowLeft className="h-5 w-5" />
-            <span className="sr-only">Go back to menu</span>
+            <span className="sr-only">Volver al menú</span>
           </Button>
-          <h1 className="font-semibold text-lg text-foreground">Your Order</h1>
+          <h1 className="font-semibold text-lg text-foreground">Tu Pedido</h1>
         </div>
       </header>
 
@@ -82,13 +82,13 @@ export default function CartPage() {
               <ShoppingBag className="h-8 w-8 text-muted-foreground" />
             </div>
             <h2 className="text-lg font-medium text-foreground">
-              Your cart is empty
+              Tu pedido está vacío
             </h2>
             <p className="text-sm text-muted-foreground mt-1">
-              Add some delicious items to get started
+              Agrega algunos deliciosos platillos para empezar
             </p>
             <Button asChild className="mt-6">
-              <Link href={menuUrl || "/"}>Browse Menu</Link>
+              <Link href={menuUrl || "/"}>Ver Menú</Link>
             </Button>
           </div>
         ) : (
@@ -106,14 +106,27 @@ export default function CartPage() {
           <div className="bg-background/80 backdrop-blur-xl border-t shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.1)] pb-8 pt-4 px-6 rounded-t-3xl">
             <div className="max-w-md mx-auto space-y-4">
 
+              {/* Tiempo estimado de preparación (ETA) */}
+              <div className="bg-orange-50 border border-orange-100 rounded-xl p-3 flex items-center gap-3">
+                <div className="bg-orange-100 p-2 rounded-lg">
+                  <Clock className="h-5 w-5 text-orange-600" />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-orange-800 uppercase tracking-wide">Tiempo Estimado</p>
+                  <p className="text-sm text-orange-950 font-semibold gap-1 flex items-center">
+                    15 - 20 minutos <span className="text-xs text-orange-600/80 font-normal">a tu mesa</span>
+                  </p>
+                </div>
+              </div>
+
               {/* Resumen de carrito colapsable - Más sutil */}
-              <div className="space-y-2">
+              <div className="space-y-2 pt-2">
                 <div className="flex justify-between items-center text-sm text-muted-foreground/80">
                   <span>Subtotal</span>
                   <span>${subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center text-sm text-muted-foreground/80">
-                  <span>Tax (8%)</span>
+                  <span>Impuestos (8%)</span>
                   <span>${tax.toFixed(2)}</span>
                 </div>
               </div>
@@ -128,7 +141,7 @@ export default function CartPage() {
                   className="w-full h-14 text-lg font-semibold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 rounded-xl max-w-[50%]"
                   onClick={() => setShowUpsell(true)}
                 >
-                  Pay Now
+                  Pagar Ahora
                   <span className="ml-2 opacity-80">→</span>
                 </Button>
               </div>
